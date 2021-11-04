@@ -7,17 +7,14 @@
              xmlns:vm="clr-namespace:tddd49.ViewModel"
              mc:Ignorable="d" 
              d:DesignHeight="427" d:DesignWidth="640">
-    <UserControl.Resources>
-        <vm:JoinHostViewModel x:Key="JoinHostVM" />
-    </UserControl.Resources>
-    <Grid  DataContext="{Binding Source={StaticResource JoinHostVM}}" Background="#FFE5E5E5" Canvas.Left="-15" Width="639" Height="426">
+    <Grid   Background="#FFE5E5E5" Canvas.Left="-15" Width="639" Height="426">
         <RadioButton x:Name="JoinChatRadio" Content="Join Chat" HorizontalAlignment="Left" Margin="228,64,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.618,-0.933" Command="{Binding JoinChatRadioCommand}" IsChecked="True" />
         <RadioButton x:Name="HostChatRadio" Content="Host Chat" HorizontalAlignment="Left" Margin="315,64,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.493,1.933"  Command="{Binding HostChatRadioCommand}"/>
         <Label x:Name="PortLabel" Content="Port" HorizontalAlignment="Left" Margin="228,107,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="PortField" HorizontalAlignment="Left" Height="23" Margin="228,133,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="158"/>
         <Label x:Name="IPLabel" Content="IP" HorizontalAlignment="Left" Margin="228,170,0,0" VerticalAlignment="Top" RenderTransformOrigin="2.1,0.538" Visibility="{Binding IPLabelVisibility}"/>
         <TextBox x:Name="IPField" HorizontalAlignment="Left" Height="23" Margin="228,196,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="158" Visibility="{Binding IPFieldVisibility}"/>
-        <Button x:Name="MainButton" Content="{Binding MainButtonContent}" HorizontalAlignment="Left" Margin="{Binding MainButtonMargin}" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.453,2.25" Height="22"/>
+        <Button x:Name="MainButton" Content="{Binding MainButtonContent}" HorizontalAlignment="Left" Margin="{Binding MainButtonMargin}" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.453,2.25" Height="22" Command="{Binding MainButtonClick}"/>
         <Label x:Name="UsernameLabel" Content="Username" HorizontalAlignment="Left" Margin="{Binding UsernameLabelMargin}" VerticalAlignment="Top"/>
         <TextBox x:Name="UsernameField" HorizontalAlignment="Left" Height="23" Margin="{Binding UsernameFieldMargin}" TextWrapping="Wrap" VerticalAlignment="Top" Width="158"/>
     </Grid>

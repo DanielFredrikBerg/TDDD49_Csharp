@@ -4,14 +4,22 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:tddd49.View"
+        xmlns:viewmodels="clr-namespace:tddd49.ViewModel"
         xmlns:local="clr-namespace:tddd49"
         mc:Ignorable="d"
         Title="MainWindow" Height="480" Width="640">
     <TabControl HorizontalAlignment="Left" Height="454" Margin="0,0,0,-5" VerticalAlignment="Top" Width="630">
         <TabItem Header="Chat">
-            <Grid>
-                <views:JoinHost/>
-            </Grid>
+            <ContentControl Content="{Binding CurrentViewModel}">
+                <ContentControl.Resources>
+                    <DataTemplate DataType="{x:Type viewmodels:JoinHostViewModel}">
+                        <views:JoinHost/>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type viewmodels:ChatViewModel}">
+                        <views:Chat/>
+                    </DataTemplate>
+                </ContentControl.Resources>
+            </ContentControl>
         </TabItem>
         <TabItem Header="History">
             <Grid Background="#FFE5E5E5" Margin="0,1,-8,0">

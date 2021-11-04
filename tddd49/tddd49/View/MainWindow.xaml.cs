@@ -15,19 +15,21 @@ using System.Windows.Shapes;
 using System.Net.Sockets;
 using System.Net;
 using tddd49.ViewModel;
+using tddd49.Stores;
 
 namespace tddd49
 {
 
     public partial class MainWindow : Window 
     {
-        private readonly MainViewModel _viewModel;
+        private readonly NavigationStore navigationStore = new NavigationStore();
+
         //private Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         public MainWindow()
         {
             InitializeComponent();
-            _viewModel = new MainViewModel();
-            DataContext = _viewModel;
+            navigationStore.CurrentViewModel = new JoinHostViewModel(navigationStore);
+            DataContext = new MainViewModel(navigationStore);
         }
 
         private void StartServer()
