@@ -12,17 +12,29 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Net.Sockets;
+using System.Net;
+using tddd49.ViewModel;
 
 namespace tddd49
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+
+    public partial class MainWindow : Window 
     {
+        private readonly MainViewModel _viewModel;
+        //private Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         public MainWindow()
         {
             InitializeComponent();
+            _viewModel = new MainViewModel();
+            DataContext = _viewModel;
         }
+
+        private void StartServer()
+        {
+           // _socket.Bind(new IPEndPoint(IPAddress.Any, 100));
+        }
+
+
     }
 }
