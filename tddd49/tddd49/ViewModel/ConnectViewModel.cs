@@ -12,7 +12,7 @@ using tddd49.Stores;
 
 namespace tddd49.ViewModel
 {
-    class ConnectViewModel : ViewModelBase, IDataErrorInfo
+    class ConnectViewModel : ViewModelBase
     {
         private string userName;
         private string iPAddress;
@@ -40,33 +40,6 @@ namespace tddd49.ViewModel
         public ICommand MainButtonClick { get => mainButtonClick; set { mainButtonClick = value; OnPropertyChanged("MainButtonClick"); } }
         public ICommand JoinChatCommand { get;  }
 
-
-        #region IDataErrorInfo Members
-
-        private string error;
-        public string Error { get => error; set { if (error != value) { error = value; OnPropertyChanged("Error"); } } }
-        public string this[string columnName] { get => OnValidate(columnName); }
-
-        private string OnValidate(string columnName)
-        {
-            string result = null;
-            if (columnName == "UserName")
-            {
-                if (string.IsNullOrEmpty(userName))
-                {
-                    result = "Username is required.";
-                }
-                else if (!Regex.IsMatch(userName, @"^[a-zA-Z_]+$"))
-                {
-                    result = "Only letters and underscores allowed in username.";
-                }
-            } else if (columnName == "")
-
-            error = result;
-
-            return result;
-        }
-        #endregion
 
 
         public ConnectViewModel(NavigationStore navigationStore)
@@ -108,12 +81,9 @@ namespace tddd49.ViewModel
 
         internal void JoinChatButton()
         {
-            if (error == null)
+            if (ValidatePort() && ValidateIP() && ValidateUserName())
             {
                 JoinChatCommand.Execute(this);
-            } else
-            {
-                MessageBox.Show(error);
             } 
         }
 
@@ -122,5 +92,50 @@ namespace tddd49.ViewModel
             Console.WriteLine("Host Chat Button");
         }
 
+        internal bool ValidatePort()
+        {
+            int portNumber;
+            if (string.IsNullOrEmpty(port))
+            {
+                MessageBox.Show("Port is required.");
+                return false;
+            }
+            else if (!int.TryParse(port, out portNumber) || portNumber < 0 || portNumber > 65535)
+            {
+                MessageBox.Show("Port should be a number 0-65535.");
+                return false;
+            }
+            return true;
+        }
+
+        internal bool ValidateIP()
+        {
+            if (string.IsNullOrEmpty(iPAddress))
+            {
+                MessageBox.Show("IP-address is required.");
+                return false;
+            }
+            else if (!Regex.IsMatch(iPAddress, @"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"))
+            {
+                MessageBox.Show("Invalid IP-address.");
+                return false;
+            }
+            return true;
+        }
+
+        internal bool ValidateUserName()
+        {
+            if (string.IsNullOrEmpty(userName))
+            {
+                MessageBox.Show("Username is required.");
+                return false;
+            }
+            else if (!Regex.IsMatch(userName, @"^[a-zA-Z_]+$"))
+            {
+                MessageBox.Show("Only letters and underscores allowed in username.");
+                return false;
+            }
+            return true;
+        }
     }
 }
