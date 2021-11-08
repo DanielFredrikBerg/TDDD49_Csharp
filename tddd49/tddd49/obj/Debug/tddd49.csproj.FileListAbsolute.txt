@@ -32,6 +32,6 @@ D:\tddd49\tddd49_danhu849_vikro653\tddd49\tddd49\obj\Debug\View\Chat.g.cs
 D:\tddd49\tddd49_danhu849_vikro653\tddd49\tddd49\obj\Debug\View\History.g.cs
 D:\tddd49\tddd49_danhu849_vikro653\tddd49\tddd49\obj\Debug\View\Chat.baml
 D:\tddd49\tddd49_danhu849_vikro653\tddd49\tddd49\obj\Debug\View\History.baml
-D:\tddd49\tddd49_danhu849_vikro653\tddd49\tddd49\obj\Debug\View\JoinHost.g.cs
 D:\tddd49\tddd49_danhu849_vikro653\tddd49\tddd49\obj\Debug\GeneratedInternalTypeHelper.g.cs
-D:\tddd49\tddd49_danhu849_vikro653\tddd49\tddd49\obj\Debug\View\JoinHost.baml
+D:\tddd49\tddd49_danhu849_vikro653\tddd49\tddd49\obj\Debug\View\Connect.g.cs
+D:\tddd49\tddd49_danhu849_vikro653\tddd49\tddd49\obj\Debug\View\Connect.baml

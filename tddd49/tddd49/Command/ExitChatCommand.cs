@@ -8,16 +8,15 @@ using tddd49.ViewModel;
 
 namespace tddd49.Command
 {
-    class JoinChatCommand : NavigationCommandBase
-    {   
-        public JoinChatCommand(NavigationStore navigationStore) : base(navigationStore)
+    class ExitChatCommand : NavigationCommandBase
+    {
+        public ExitChatCommand(NavigationStore navigationStore) : base(navigationStore)
         {
         }
 
         override public void Execute(object parameter)
         {
-            _navigationStore.CurrentViewModel = new ChatViewModel(_navigationStore);
+            _navigationStore.CurrentViewModel = new ConnectViewModel(_navigationStore);
         }
-
     }
 }

@@ -12,7 +12,7 @@
         <TabItem Header="Chat">
             <ContentControl Content="{Binding CurrentViewModel}">
                 <ContentControl.Resources>
-                    <DataTemplate DataType="{x:Type viewmodels:JoinHostViewModel}">
+                    <DataTemplate DataType="{x:Type viewmodels:ConnectViewModel}">
                         <views:JoinHost/>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type viewmodels:ChatViewModel}">

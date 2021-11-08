@@ -81,7 +81,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\JoinHost.xaml">
+    <Page Include="View\Connect.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -93,11 +93,21 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Command\ExitChatCommand.cs" />
     <Compile Include="Command\JoinChatCommand.cs" />
+    <Compile Include="Command\NavigationCommandBase.cs" />
     <Compile Include="Command\RelayCommand.cs" />
+    <Compile Include="Model\ChatConversation.cs" />
+    <Compile Include="Model\ChatHistory.cs" />
+    <Compile Include="Model\ChatMessage.cs" />
+    <Compile Include="Network\ChatBase.cs" />
+    <Compile Include="Network\Client.cs" />
+    <Compile Include="Network\HostChat.cs" />
+    <Compile Include="Network\JoinChat.cs" />
     <Compile Include="Stores\NavigationStore.cs" />
     <Compile Include="ViewModel\ChatViewModel.cs" />
-    <Compile Include="ViewModel\JoinHostViewModel.cs" />
+    <Compile Include="ViewModel\ConnectViewModel.cs" />
+    <Compile Include="ViewModel\HistoryViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="View\Chat.xaml.cs">
@@ -106,8 +116,8 @@
     <Compile Include="View\History.xaml.cs">
       <DependentUpon>History.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\JoinHost.xaml.cs">
-      <DependentUpon>JoinHost.xaml</DependentUpon>
+    <Compile Include="View\Connect.xaml.cs">
+      <DependentUpon>Connect.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -141,7 +151,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Model\" />
+    <Folder Include="Exception\" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.8">

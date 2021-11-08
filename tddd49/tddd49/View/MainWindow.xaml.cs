@@ -12,8 +12,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Net.Sockets;
-using System.Net;
 using tddd49.ViewModel;
 using tddd49.Stores;
 
@@ -24,19 +22,11 @@ namespace tddd49
     {
         private readonly NavigationStore navigationStore = new NavigationStore();
 
-        //private Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         public MainWindow()
         {
             InitializeComponent();
-            navigationStore.CurrentViewModel = new JoinHostViewModel(navigationStore);
+            navigationStore.CurrentViewModel = new ConnectViewModel(navigationStore);
             DataContext = new MainViewModel(navigationStore);
         }
-
-        private void StartServer()
-        {
-           // _socket.Bind(new IPEndPoint(IPAddress.Any, 100));
-        }
-
-
     }
 }

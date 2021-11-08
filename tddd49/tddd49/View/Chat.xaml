@@ -5,9 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:tddd49.View"
              mc:Ignorable="d" 
-             d:DesignHeight="480" d:DesignWidth="640">
+             d:DesignHeight="454" d:DesignWidth="630">
     <Grid Background="#FFE5E5E5" Canvas.Left="-15" Width="639" Height="426">
-        <Label Content="CHAT VIEW TODO" HorizontalAlignment="Left" Margin="244,205,0,0" VerticalAlignment="Top" FontSize="22"/>
-
+        <TextBox HorizontalAlignment="Left" Height="380" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="612" Margin="4,4,0,0"/>
+        <Button x:Name="ExitChatButton" Content="Exit" HorizontalAlignment="Left" Margin="585,393,0,0" VerticalAlignment="Top" Width="31" RenderTransformOrigin="-0.151,0.806" Command="{Binding ExitChatCommand}"/>
+        <Button Content="Send Image" HorizontalAlignment="Left" Margin="355,393,0,0" VerticalAlignment="Top" Width="75"/>
+        <Button Content="Send" HorizontalAlignment="Left" Margin="301,393,0,0" VerticalAlignment="Top" Width="49" RenderTransformOrigin="0.35,1.114"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="4,390,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="292"/>
     </Grid>
 </UserControl>
