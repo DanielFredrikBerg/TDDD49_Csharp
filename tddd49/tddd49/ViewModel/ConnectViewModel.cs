@@ -4,16 +4,20 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using tddd49.Command;
+using tddd49.Network;
 using tddd49.Stores;
 
 namespace tddd49.ViewModel
 {
     class ConnectViewModel : ViewModelBase
     {
+        private Client client;
+
         private string userName;
         private string iPAddress;
         private string port;
@@ -25,7 +29,7 @@ namespace tddd49.ViewModel
         private Thickness mainButtonMargin;
         private string mainButtonContent;
         private ICommand mainButtonClick;
-
+        private string listenningStatus;
 
         public string UserName { get => userName; set { userName = value;  OnPropertyChanged("UserName"); } }
         public string IPAddress { get => iPAddress; set { iPAddress = value; OnPropertyChanged("IPAddress"); } }
@@ -38,8 +42,8 @@ namespace tddd49.ViewModel
         public Thickness MainButtonMargin { get => mainButtonMargin; set { mainButtonMargin = value; OnPropertyChanged("MainButtonMargin"); } }
         public string MainButtonContent { get => mainButtonContent; set { mainButtonContent = value; OnPropertyChanged("MainButtonContent"); } }
         public ICommand MainButtonClick { get => mainButtonClick; set { mainButtonClick = value; OnPropertyChanged("MainButtonClick"); } }
+        public string ListeningStatus { get => listenningStatus; set { listenningStatus = value; OnPropertyChanged("ListeningMsg"); } }
         public ICommand JoinChatCommand { get;  }
-
 
 
         public ConnectViewModel(NavigationStore navigationStore)
@@ -61,9 +65,9 @@ namespace tddd49.ViewModel
         {
             IPLabelVisibility = Visibility.Visible;
             IPFieldVisibility = Visibility.Visible;
-            UsernameLabelMargin = new Thickness(228, 233, 0, 0);
-            UsernameFieldMargin = new Thickness(228, 259, 0, 0);
-            MainButtonMargin = new Thickness(268, 309, 0, 0);
+            UsernameLabelMargin = new Thickness(-98, 233, 0, 0);
+            UsernameFieldMargin = new Thickness(0, 259, 0, 0);
+            MainButtonMargin = new Thickness(0, 309, 0, 0);
             MainButtonContent = "Join Chat";
             MainButtonClick = JoinChatButtonCommand;
         }
@@ -72,9 +76,9 @@ namespace tddd49.ViewModel
         {
             IPLabelVisibility = Visibility.Hidden;
             IPFieldVisibility = Visibility.Hidden;
-            UsernameLabelMargin = new Thickness(228, 170, 0, 0);
-            UsernameFieldMargin = new Thickness(228, 196, 0, 0);
-            MainButtonMargin = new Thickness(268, 246, 0, 0);
+            UsernameLabelMargin = new Thickness(-98, 170, 0, 0);
+            UsernameFieldMargin = new Thickness(0, 196, 0, 0);
+            MainButtonMargin = new Thickness(0, 246, 0, 0);
             MainButtonContent = "Host Chat";
             MainButtonClick = HostChatButtonCommand;
         }
@@ -83,13 +87,41 @@ namespace tddd49.ViewModel
         {
             if (ValidatePort() && ValidateIP() && ValidateUserName())
             {
-                JoinChatCommand.Execute(this);
+                if (client != null)
+                {
+                    client.Close();
+                }
+                else
+                {
+                    client = new Client(port, iPAddress);
+                }
+                client.Connect();
+                //JoinChatCommand.Execute(this);
             } 
         }
 
         internal void HostChatButton()
         {
-            Console.WriteLine("Host Chat Button");
+            if (ValidatePort() && ValidateUserName())
+            {
+                if (client != null)
+                {
+                    client.Close();
+                }
+                client = new Client(port);
+
+                client.Listen();
+
+                Thread.Sleep(100);
+                if (client.isListening)
+                {
+                    ListeningStatus = $"Listening on 127.0.0.1 : {port}";
+                }
+                else
+                {
+                    ListeningStatus = "";
+                }  
+            }
         }
 
         internal bool ValidatePort()

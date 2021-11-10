@@ -100,10 +100,7 @@
     <Compile Include="Model\ChatConversation.cs" />
     <Compile Include="Model\ChatHistory.cs" />
     <Compile Include="Model\ChatMessage.cs" />
-    <Compile Include="Network\ChatBase.cs" />
     <Compile Include="Network\Client.cs" />
-    <Compile Include="Network\HostChat.cs" />
-    <Compile Include="Network\JoinChat.cs" />
     <Compile Include="Stores\NavigationStore.cs" />
     <Compile Include="ViewModel\ChatViewModel.cs" />
     <Compile Include="ViewModel\ConnectViewModel.cs" />

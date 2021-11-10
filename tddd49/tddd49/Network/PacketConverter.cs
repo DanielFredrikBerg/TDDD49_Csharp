@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace tddd49.Network
 {
-    class HostChat : ChatBase
+    class PacketConverter
     {
     }
 }
