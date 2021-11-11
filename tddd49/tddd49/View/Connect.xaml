@@ -17,6 +17,6 @@
         <Button x:Name="MainButton" Content="{Binding MainButtonContent}" HorizontalAlignment="Center" Margin="{Binding MainButtonMargin}" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.453,2.25" Height="22" Command="{Binding MainButtonClick}"/>
         <Label x:Name="UsernameLabel" Content="Username" HorizontalAlignment="Center" Margin="{Binding UsernameLabelMargin}" VerticalAlignment="Top"/>
         <TextBox x:Name="UsernameField" HorizontalAlignment="Center" Height="23" Margin="{Binding UsernameFieldMargin}" TextWrapping="Wrap" VerticalAlignment="Top" Width="158" Text="{Binding UserName}"/>
-        <Label x:Name="ListeningMsg" HorizontalAlignment="Center" Margin="0,362,0,0" VerticalAlignment="Top" Content="{Binding ListeningMsg}"/>
+        <Label x:Name="ConnectStatusMessage" HorizontalAlignment="Center" Margin="0,352,0,0" VerticalAlignment="Top" Content="{Binding ConnectStatusMessage}"/>
     </Grid>
 </UserControl>

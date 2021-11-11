@@ -2,53 +2,59 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Net;
 using System.Windows;
 using System.Threading;
+using System.ComponentModel;
+using static tddd49.Network.Packet;
+
 
 namespace tddd49.Network
 {
     class Client
     {
+        private IPAddress ipAddress;
+        private int port;
+
+        private Socket _socket;
+        private IPEndPoint _ipEndPoint;
+
+        private Thread ConnectThread;
+        private Thread ListenThread;
+        private Thread SendThread;
+        private Thread RecieveThread;
         
-        IPAddress ipAddress;
-        int port;
 
-        Socket _socket;
-        IPEndPoint _ipEndPoint;
+        // updates ConnectViewModel/ChatViewModel on network events
+        public EventHandler StartListenEvent;
+        public EventHandler StopListenEvent;
+        public EventHandler ChatRequestSentEvent;
+        public EventHandler ChatRequestRecievedEvent;
+        public EventHandler ChatRequestAcceptedEvent;
+        public EventHandler ChatRequestDeclinedEvent;
+        public EventHandler ChatMessageRecievedEvent;
 
-        Thread ConnectThread;
-        Thread ListenThread;
-        Thread SendThread;
-        Thread RecieveThread;
-
-        public bool isListening;
-
-        public Client(string portString, string ipString = null)
+        public Client(string portString, string ipString)
         {
-     
             _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-            ConnectThread = new Thread(_connect);
-            ListenThread = new Thread(_listen);
-            RecieveThread = new Thread(_recieve);
+            ConnectThread = new Thread((userName) => _Connect((string) userName));
+            ConnectThread.IsBackground = true;
 
-            isListening = false;
+            ListenThread = new Thread(_Listen);
+            ListenThread.IsBackground = true;
 
-            if (ipString == null)
+            RecieveThread = new Thread(_Recieve);
+            RecieveThread.IsBackground = true;
+
+            if (!IPAddress.TryParse(ipString, out ipAddress))
             {
-                IPAddress.TryParse("127.0.0.1", out ipAddress);
-            }
-            else
-            { 
-                if (!IPAddress.TryParse(ipString, out ipAddress))
-                {
                     // throw exception
-                }
             }
- 
+    
             if (!int.TryParse(portString, out port))
             { 
                 // throw exception
@@ -57,55 +63,31 @@ namespace tddd49.Network
             _ipEndPoint = new IPEndPoint(ipAddress, port);
         }
 
-        public void Listen()
-        {
-           ListenThread.Start();
 
-            //MessageBox.Show("Listening...");
+        public void Connect(string userName)
+        {
+            ConnectThread.Start(userName);
         }
 
-        public void Connect()
-        {
-            if (ConnectThread.IsAlive)
-            {    
-                ConnectThread.Abort();
-                ConnectThread = new Thread(_connect);
-            }
-
-            Close();
-           
-            ConnectThread.Start();
-        }
-
-        public void Send(String message)
-        {
-
-        }
-
-        public void Recieve()
-        {
-            RecieveThread.Start();
-        }
-
- 
-        private void _connect()
+        private void _Connect(string userName)
         {
             try
             {
                 _socket.Connect(_ipEndPoint);
-                //Thread.Sleep(1000);
             }
             catch
             {
-                MessageBox.Show($"Unable to connect to {ipAddress}:{port}");
+                MessageBox.Show($"Unable to connect to {ipAddress}:{port}", "Error");
+                return;
             }
 
-            MessageBox.Show("Connected: " + _socket.Connected.ToString());
+            ChatRequestSentEvent?.Invoke(this, null);
+            _SendPacket(PacketType.RequestChat, userName);
         }
 
-        private void _listen()
-        {
 
+        public void Listen()
+        {
             if (!_socket.IsBound)
             {
                 try
@@ -114,55 +96,112 @@ namespace tddd49.Network
                 }
                 catch
                 {
-                    MessageBox.Show($"port {port} is already in use.");
-                    isListening = false;
+                    MessageBox.Show($"Port {port} is already in use.", "Error");
                     return;
                 }
-                
             }
+            ListenThread.Start();
+        }
 
+        private void _Listen()
+        {
             // start listening
             _socket.Listen(1024);
-            isListening = true;
+            StartListenEvent?.Invoke(this, null);
 
             // wait for connection
             _socket = _socket.Accept();
 
-            MessageBox.Show("Connected: " + _socket.Connected.ToString());
+            StopListenEvent?.Invoke(this, null);
+            RecieveThread.Start();
         }
 
-        private void _send()
+
+        public void SendPacket(String userName, string message = "")
         {
 
         }
 
-        private void _recieve()
+        private void _SendPacket(PacketType type, string userName, string message = "")
         {
-            byte[] bytes = new byte[1024];
-            try
+            if (_socket.Connected)
             {
-                _socket.Receive(bytes);
+                Packet packet = new Packet(type, userName, message);
+                string jsonString = JsonSerializer.Serialize(packet);
+                byte[] bytes = Encoding.UTF8.GetBytes(jsonString);
+
+                try
+                { 
+                    _socket.Send(bytes);
+                }
+                catch
+                {
+                    MessageBox.Show("Send Error");
+                    // throw exception ?
+                }
+
             }
-            catch (Exception e)
+        }
+
+        private void _Recieve()
+        {
+            while (true)
             {
-                MessageBox.Show(e.ToString());
+                byte[] bytes = new byte[1024];
+                try
+                {
+                    _socket.Receive(bytes);
+                    if (bytes.Count() > 0)
+                    {
+                        string jsonString = Encoding.UTF8.GetString(bytes).Trim((char) 0x00);
+                        MessageBox.Show(jsonString);
+                        MessageBox.Show(jsonString.Length.ToString());
+                        MessageBox.Show(jsonString.Count().ToString());
+                        JsonSerializerOptions jso = new JsonSerializerOptions();
+                        jso.AllowTrailingCommas = true;
+                        jso.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+                        Packet packet = JsonSerializer.Deserialize<Packet>(jsonString, jso);
+                        OnPacketRecieved(packet);
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message);
+                    StopListenEvent?.Invoke(this, null);
+                    Close();
+                    return;
+                }
+            }
+
+        }
+
+        private void OnPacketRecieved(Packet packet)
+        {
+            MessageBox.Show("OnPacketRecieved");
+            if (packet.packetType == PacketType.RequestChat)
+            {
+                MessageBox.Show("Request Chat Message Recieved");
+            }
+            else if (packet.packetType == PacketType.AcceptChat)
+            {
+
+            }
+            else if (packet.packetType == PacketType.DeclineChat)
+            {
+
+            }
+            else if (packet.packetType == PacketType.ChatMessage)
+            {
+
             }
         }
 
         public void Close()
         {
-            //_socket.Close();
             Thread thread = new Thread(_close);
+            thread.IsBackground = true;
             thread.Start();
-            
-            /*
-            if (_socket.Connected)
-            {
-                _socket.LingerState = new LingerOption(false, 0);
-                _socket.Shutdown(SocketShutdown.Both);
-                _socket.Disconnect(false);
-            }
-            */
         }
 
         private void _close()

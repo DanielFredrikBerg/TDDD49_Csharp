@@ -8,17 +8,19 @@ namespace tddd49.Network
 {
     class Packet
     {
-        public PacketType _packetType;
-        public String _content;
+        public PacketType packetType { get; set; }
+        public string userName { get; set; }
+        public String message { get; set; }
 
-        public Packet(PacketType type, string content = null)
+        public Packet(PacketType packetType, string userName, string message = "")
         {
-            _packetType = type;
-            _content = content;
+            this.packetType = packetType;
+            this.userName = userName;
+            this.message = message;
         }
         public enum PacketType : byte
         {
-            JoinChat = 0,
+            RequestChat = 0,
             AcceptChat = 1,
             DeclineChat = 2,
             ChatMessage = 3

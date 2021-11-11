@@ -16,12 +16,20 @@ namespace tddd49.ViewModel
 {
     class ConnectViewModel : ViewModelBase
     {
+        // network functions
         private Client client;
 
+        // store TextField input
         private string userName;
         private string iPAddress;
         private string port;
 
+        public string UserName { get => userName; set { userName = value; OnPropertyChanged("UserName"); } }
+        public string IPAddress { get => iPAddress; set { iPAddress = value; OnPropertyChanged("IPAddress"); } }
+        public string Port { get => port; set { port = value; OnPropertyChanged("Port"); } }
+
+
+        // used to update UI with Join/Host radiobuttons
         private Visibility iPLabelVisibility;
         private Visibility iPFieldVisibility;
         private Thickness usernameLabelMargin;
@@ -29,39 +37,39 @@ namespace tddd49.ViewModel
         private Thickness mainButtonMargin;
         private string mainButtonContent;
         private ICommand mainButtonClick;
-        private string listenningStatus;
-
-        public string UserName { get => userName; set { userName = value;  OnPropertyChanged("UserName"); } }
-        public string IPAddress { get => iPAddress; set { iPAddress = value; OnPropertyChanged("IPAddress"); } }
-        public string Port { get => port; set { port = value; OnPropertyChanged("Port"); } }
-
+        private string connectStatusMessage;
+       
         public Visibility IPLabelVisibility { get => iPLabelVisibility; set { iPLabelVisibility = value; OnPropertyChanged("IPLabelVisibility"); } }
         public Visibility IPFieldVisibility { get => iPFieldVisibility; set { iPFieldVisibility = value; OnPropertyChanged("IPFieldVisibility"); } }
         public Thickness UsernameLabelMargin { get => usernameLabelMargin;  set { usernameLabelMargin = value; OnPropertyChanged("UsernameLabelMargin"); } }
         public Thickness UsernameFieldMargin { get => usernameFieldMargin;  set { usernameFieldMargin = value; OnPropertyChanged("UsernameFieldMargin"); } }
         public Thickness MainButtonMargin { get => mainButtonMargin; set { mainButtonMargin = value; OnPropertyChanged("MainButtonMargin"); } }
         public string MainButtonContent { get => mainButtonContent; set { mainButtonContent = value; OnPropertyChanged("MainButtonContent"); } }
+        public string ConnectStatusMessage { get => connectStatusMessage; set { connectStatusMessage = value; OnPropertyChanged("ConnectStatusMessage"); } }
         public ICommand MainButtonClick { get => mainButtonClick; set { mainButtonClick = value; OnPropertyChanged("MainButtonClick"); } }
-        public string ListeningStatus { get => listenningStatus; set { listenningStatus = value; OnPropertyChanged("ListeningMsg"); } }
+
+       
+        // navigation to ChatView command
         public ICommand JoinChatCommand { get;  }
 
 
+        // button commands
+        public ICommand JoinChatRadioCommand { get => new RelayCommand(JoinChatRadio); }
+        public ICommand HostChatRadioCommand { get => new RelayCommand(HostChatRadio); }
+        public ICommand JoinChatButtonCommand { get => new RelayCommand(JoinChatButton); }
+        public ICommand HostChatButtonCommand { get => new RelayCommand(HostChatButton); }
+
+
+        // constructor
         public ConnectViewModel(NavigationStore navigationStore)
         {
             JoinChatCommand = new JoinChatCommand(navigationStore);
-            JoinChatRadio();
+            JoinChatRadio();  // set UI to JoinChat
         }
 
 
-        public ICommand JoinChatRadioCommand { get => new RelayCommand(JoinChatRadio); }
-
-        public ICommand HostChatRadioCommand { get => new RelayCommand(HostChatRadio); }
-
-        public ICommand JoinChatButtonCommand { get => new RelayCommand(JoinChatButton); }
-
-        public ICommand HostChatButtonCommand { get => new RelayCommand(HostChatButton); }
-
-        internal void JoinChatRadio()
+        // button functions
+        private void JoinChatRadio()
         {
             IPLabelVisibility = Visibility.Visible;
             IPFieldVisibility = Visibility.Visible;
@@ -72,7 +80,7 @@ namespace tddd49.ViewModel
             MainButtonClick = JoinChatButtonCommand;
         }
 
-        internal void HostChatRadio()
+        private void HostChatRadio()
         {
             IPLabelVisibility = Visibility.Hidden;
             IPFieldVisibility = Visibility.Hidden;
@@ -87,16 +95,8 @@ namespace tddd49.ViewModel
         {
             if (ValidatePort() && ValidateIP() && ValidateUserName())
             {
-                if (client != null)
-                {
-                    client.Close();
-                }
-                else
-                {
-                    client = new Client(port, iPAddress);
-                }
-                client.Connect();
-                //JoinChatCommand.Execute(this);
+                ResetClient();
+                client.Connect(userName);
             } 
         }
 
@@ -104,27 +104,36 @@ namespace tddd49.ViewModel
         {
             if (ValidatePort() && ValidateUserName())
             {
-                if (client != null)
-                {
-                    client.Close();
-                }
-                client = new Client(port);
-
+                iPAddress = "127.0.0.1";
+                ResetClient();
                 client.Listen();
-
-                Thread.Sleep(100);
-                if (client.isListening)
-                {
-                    ListeningStatus = $"Listening on 127.0.0.1 : {port}";
-                }
-                else
-                {
-                    ListeningStatus = "";
-                }  
             }
         }
 
-        internal bool ValidatePort()
+        private void ResetClient()
+        {
+            if (client != null)
+            {
+                client.Close();
+                ConnectStatusMessage = "";
+            }
+
+            client = new Client(port, iPAddress);
+            SetClientEvents();
+        }
+
+
+        // set Client EventHandlers
+        private void SetClientEvents()
+        {
+            client.StartListenEvent += (source, _) => { ConnectStatusMessage = $"Listening on {iPAddress} : {port}"; };
+            client.StopListenEvent += (source, _) => { ConnectStatusMessage = ""; };
+            client.ChatRequestSentEvent += (source, _) => { ConnectStatusMessage = $"Waiting for response from {iPAddress} : {port}";  };
+        }
+
+
+        // validate TextField input
+        private bool ValidatePort()
         {
             int portNumber;
             if (string.IsNullOrEmpty(port))
@@ -140,7 +149,7 @@ namespace tddd49.ViewModel
             return true;
         }
 
-        internal bool ValidateIP()
+        private bool ValidateIP()
         {
             if (string.IsNullOrEmpty(iPAddress))
             {
@@ -155,7 +164,7 @@ namespace tddd49.ViewModel
             return true;
         }
 
-        internal bool ValidateUserName()
+        private bool ValidateUserName()
         {
             if (string.IsNullOrEmpty(userName))
             {
@@ -169,5 +178,6 @@ namespace tddd49.ViewModel
             }
             return true;
         }
+
     }
 }
