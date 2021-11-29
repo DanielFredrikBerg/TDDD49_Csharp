@@ -12,7 +12,7 @@ namespace tddd49.Network
         public string userName { get; set; }
         public String message { get; set; }
 
-        public Packet(PacketType packetType, string userName, string message = "")
+        public Packet(PacketType packetType, string userName, string message)
         {
             this.packetType = packetType;
             this.userName = userName;

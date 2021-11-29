@@ -96,7 +96,7 @@ namespace tddd49.ViewModel
             if (ValidatePort() && ValidateIP() && ValidateUserName())
             {
                 ResetClient();
-                client.Connect(userName);
+                client.InitConnection();
             } 
         }
 
@@ -106,7 +106,7 @@ namespace tddd49.ViewModel
             {
                 iPAddress = "127.0.0.1";
                 ResetClient();
-                client.Listen();
+                client.InitListening();
             }
         }
 
@@ -118,17 +118,7 @@ namespace tddd49.ViewModel
                 ConnectStatusMessage = "";
             }
 
-            client = new Client(port, iPAddress);
-            SetClientEvents();
-        }
-
-
-        // set Client EventHandlers
-        private void SetClientEvents()
-        {
-            client.StartListenEvent += (source, _) => { ConnectStatusMessage = $"Listening on {iPAddress} : {port}"; };
-            client.StopListenEvent += (source, _) => { ConnectStatusMessage = ""; };
-            client.ChatRequestSentEvent += (source, _) => { ConnectStatusMessage = $"Waiting for response from {iPAddress} : {port}";  };
+            client = new Client(port, iPAddress, userName);
         }
 
 

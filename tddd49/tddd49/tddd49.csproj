@@ -132,7 +132,6 @@
     <Compile Include="Model\ChatMessage.cs" />
     <Compile Include="Network\Client.cs" />
     <Compile Include="Network\Packet.cs" />
-    <Compile Include="Network\PacketConverter.cs" />
     <Compile Include="Stores\NavigationStore.cs" />
     <Compile Include="ViewModel\ChatViewModel.cs" />
     <Compile Include="ViewModel\ConnectViewModel.cs" />

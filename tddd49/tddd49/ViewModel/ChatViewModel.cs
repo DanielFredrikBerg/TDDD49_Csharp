@@ -7,16 +7,18 @@ using System.Windows.Input;
 using System.Net.Sockets;
 using tddd49.Command;
 using tddd49.Stores;
+using tddd49.Network;
 
 namespace tddd49.ViewModel
 {
     class ChatViewModel : ViewModelBase
     {
-        private Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        private Client client;
         public ICommand ExitChatCommand { get; }
-        public ChatViewModel(NavigationStore navigationStore)
+        public ChatViewModel(NavigationStore navigationStore, Client client)
         {
             ExitChatCommand = new ExitChatCommand(navigationStore);
+            this.client = client;
         }
 
         internal void ExitChatButton()

@@ -19,61 +19,39 @@ namespace tddd49.Network
         private IPAddress ipAddress;
         private int port;
 
-        private Socket _socket;
-        private IPEndPoint _ipEndPoint;
+        private Socket sendSocket;
+        private Socket recieveSocket;
+        private IPEndPoint ipEndPoint;
 
-        private Thread ConnectThread;
-        private Thread ListenThread;
-        private Thread SendThread;
-        private Thread RecieveThread;
-        
+        private string hostName;
+        private string peerName;
 
-        // updates ConnectViewModel/ChatViewModel on network events
-        public EventHandler StartListenEvent;
-        public EventHandler StopListenEvent;
-        public EventHandler ChatRequestSentEvent;
-        public EventHandler ChatRequestRecievedEvent;
-        public EventHandler ChatRequestAcceptedEvent;
-        public EventHandler ChatRequestDeclinedEvent;
-        public EventHandler ChatMessageRecievedEvent;
+        private Task listenTask;
 
-        public Client(string portString, string ipString)
+        public Client(string portStr, string ipStr, string hostName)
         {
-            _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            this.hostName = hostName;
 
-            ConnectThread = new Thread((userName) => _Connect((string) userName));
-            ConnectThread.IsBackground = true;
-
-            ListenThread = new Thread(_Listen);
-            ListenThread.IsBackground = true;
-
-            RecieveThread = new Thread(_Recieve);
-            RecieveThread.IsBackground = true;
-
-            if (!IPAddress.TryParse(ipString, out ipAddress))
+            if (!IPAddress.TryParse(ipStr, out ipAddress))
             {
                     // throw exception
             }
     
-            if (!int.TryParse(portString, out port))
+            if (!int.TryParse(portStr, out port))
             { 
                 // throw exception
             }
 
-            _ipEndPoint = new IPEndPoint(ipAddress, port);
+            ipEndPoint = new IPEndPoint(ipAddress, port);
+
+            sendSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         }
 
-
-        public void Connect(string userName)
-        {
-            ConnectThread.Start(userName);
-        }
-
-        private void _Connect(string userName)
+        public void InitConnection()
         {
             try
             {
-                _socket.Connect(_ipEndPoint);
+                sendSocket.Connect(ipEndPoint);
             }
             catch
             {
@@ -81,18 +59,19 @@ namespace tddd49.Network
                 return;
             }
 
-            ChatRequestSentEvent?.Invoke(this, null);
-            _SendPacket(PacketType.RequestChat, userName);
+            SendPacket(PacketType.RequestChat);
+
+            Task listenTask = Task.Run(() => Listen());
         }
 
 
-        public void Listen()
+        public async void InitListening()
         {
-            if (!_socket.IsBound)
+            if (!sendSocket.IsBound)
             {
                 try
                 {
-                    _socket.Bind(_ipEndPoint);
+                    sendSocket.Bind(ipEndPoint);
                 }
                 catch
                 {
@@ -100,63 +79,54 @@ namespace tddd49.Network
                     return;
                 }
             }
-            ListenThread.Start();
+            await Task.Run(Listen);
+            //await listenTask.
         }
 
-        private void _Listen()
+        private void Listen()
         {
             // start listening
-            _socket.Listen(1024);
-            StartListenEvent?.Invoke(this, null);
+            sendSocket.Listen(1024);
+            MessageBox.Show("listening on ...");
 
             // wait for connection
-            _socket = _socket.Accept();
+            recieveSocket = sendSocket.Accept();
 
-            StopListenEvent?.Invoke(this, null);
-            RecieveThread.Start();
+            Task listenTask = Task.Run(() => Recieve());
         }
 
-
-        public void SendPacket(String userName, string message = "")
+        public void SendPacket(PacketType type, string message = "")
         {
-
-        }
-
-        private void _SendPacket(PacketType type, string userName, string message = "")
-        {
-            if (_socket.Connected)
+            if (sendSocket.Connected)
             {
-                Packet packet = new Packet(type, userName, message);
+                Packet packet = new Packet(type, hostName, message);
                 string jsonString = JsonSerializer.Serialize(packet);
                 byte[] bytes = Encoding.UTF8.GetBytes(jsonString);
 
                 try
                 { 
-                    _socket.Send(bytes);
+                    sendSocket.Send(bytes);
                 }
                 catch
                 {
-                    MessageBox.Show("Send Error");
+                    MessageBox.Show("Connection Lost");
                     // throw exception ?
                 }
 
             }
         }
 
-        private void _Recieve()
+        private void Recieve()
         {
             while (true)
             {
                 byte[] bytes = new byte[1024];
                 try
                 {
-                    _socket.Receive(bytes);
+                    sendSocket.Receive(bytes);
                     if (bytes.Count() > 0)
                     {
                         string jsonString = Encoding.UTF8.GetString(bytes).Trim((char) 0x00);
-                        MessageBox.Show(jsonString);
-                        MessageBox.Show(jsonString.Length.ToString());
-                        MessageBox.Show(jsonString.Count().ToString());
                         JsonSerializerOptions jso = new JsonSerializerOptions();
                         jso.AllowTrailingCommas = true;
                         jso.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
@@ -167,8 +137,6 @@ namespace tddd49.Network
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show(e.Message);
-                    StopListenEvent?.Invoke(this, null);
                     Close();
                     return;
                 }
@@ -178,18 +146,25 @@ namespace tddd49.Network
 
         private void OnPacketRecieved(Packet packet)
         {
-            MessageBox.Show("OnPacketRecieved");
             if (packet.packetType == PacketType.RequestChat)
             {
-                MessageBox.Show("Request Chat Message Recieved");
+                if (MessageBox.Show($"{packet.userName} Wants to Chat, Accept ?", "Chat Request", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    SendPacket(PacketType.AcceptChat);
+     
+                }
+                else
+                {
+                    SendPacket(PacketType.DeclineChat);
+                }
             }
             else if (packet.packetType == PacketType.AcceptChat)
             {
-
+    
             }
             else if (packet.packetType == PacketType.DeclineChat)
             {
-
+     
             }
             else if (packet.packetType == PacketType.ChatMessage)
             {
@@ -206,9 +181,8 @@ namespace tddd49.Network
 
         private void _close()
         {
-            _socket.Close();
-            ListenThread.Abort();
-            RecieveThread.Abort();
+            sendSocket.Close();
+            recieveSocket.Close();
         }
 
 
