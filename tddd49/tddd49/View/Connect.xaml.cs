@@ -18,9 +18,9 @@ namespace tddd49.View
     /// <summary>
     /// Interaction logic for JoinHost.xaml
     /// </summary>
-    public partial class JoinHost : UserControl
+    public partial class Connect : UserControl
     {
-        public JoinHost()
+        public Connect()
         {
             InitializeComponent();
         }

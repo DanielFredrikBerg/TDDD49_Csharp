@@ -37,7 +37,6 @@ namespace tddd49.ViewModel
         private Thickness mainButtonMargin;
         private string mainButtonContent;
         private ICommand mainButtonClick;
-        private string connectStatusMessage;
        
         public Visibility IPLabelVisibility { get => iPLabelVisibility; set { iPLabelVisibility = value; OnPropertyChanged("IPLabelVisibility"); } }
         public Visibility IPFieldVisibility { get => iPFieldVisibility; set { iPFieldVisibility = value; OnPropertyChanged("IPFieldVisibility"); } }
@@ -45,7 +44,6 @@ namespace tddd49.ViewModel
         public Thickness UsernameFieldMargin { get => usernameFieldMargin;  set { usernameFieldMargin = value; OnPropertyChanged("UsernameFieldMargin"); } }
         public Thickness MainButtonMargin { get => mainButtonMargin; set { mainButtonMargin = value; OnPropertyChanged("MainButtonMargin"); } }
         public string MainButtonContent { get => mainButtonContent; set { mainButtonContent = value; OnPropertyChanged("MainButtonContent"); } }
-        public string ConnectStatusMessage { get => connectStatusMessage; set { connectStatusMessage = value; OnPropertyChanged("ConnectStatusMessage"); } }
         public ICommand MainButtonClick { get => mainButtonClick; set { mainButtonClick = value; OnPropertyChanged("MainButtonClick"); } }
 
        
@@ -115,10 +113,10 @@ namespace tddd49.ViewModel
             if (client != null)
             {
                 client.Close();
-                ConnectStatusMessage = "";
             }
 
             client = new Client(port, iPAddress, userName);
+            client.connectToChat += (source, _) => { JoinChatCommand.Execute(client); };
         }
 
 

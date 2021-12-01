@@ -19,14 +19,17 @@ namespace tddd49.Network
         private IPAddress ipAddress;
         private int port;
 
-        private Socket sendSocket;
-        private Socket recieveSocket;
+        private Socket socket;
         private IPEndPoint ipEndPoint;
 
         private string hostName;
         private string peerName;
 
-        private Task listenTask;
+        public EventHandler connectToChat;
+        public EventHandler recieveChatMessage;
+        public EventHandler disconnected;
+        public String HostName { get => hostName; }
+        public String PeerName { get => peerName; }
 
         public Client(string portStr, string ipStr, string hostName)
         {
@@ -44,14 +47,15 @@ namespace tddd49.Network
 
             ipEndPoint = new IPEndPoint(ipAddress, port);
 
-            sendSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         }
 
         public void InitConnection()
         {
             try
             {
-                sendSocket.Connect(ipEndPoint);
+                socket.Connect(ipEndPoint);
+                //MessageBox.Show("Init connection post connect");
             }
             catch
             {
@@ -61,17 +65,18 @@ namespace tddd49.Network
 
             SendPacket(PacketType.RequestChat);
 
-            Task listenTask = Task.Run(() => Listen());
+            //Task listenTask = Task.Run(() => Listen());
+            Task.Run(Receive);
         }
 
 
         public async void InitListening()
         {
-            if (!sendSocket.IsBound)
+            if (!socket.IsBound)
             {
                 try
                 {
-                    sendSocket.Bind(ipEndPoint);
+                    socket.Bind(ipEndPoint);
                 }
                 catch
                 {
@@ -86,18 +91,19 @@ namespace tddd49.Network
         private void Listen()
         {
             // start listening
-            sendSocket.Listen(1024);
-            MessageBox.Show("listening on ...");
+            socket.Listen(1024);
+            MessageBox.Show($"Listening for connections on {ipAddress}:{port}");
 
             // wait for connection
-            recieveSocket = sendSocket.Accept();
+            socket = socket.Accept();
 
-            Task listenTask = Task.Run(() => Recieve());
+            //Task listenTask = Task.Run(() => Recieve());
+            Task.Run(Receive);
         }
 
         public void SendPacket(PacketType type, string message = "")
         {
-            if (sendSocket.Connected)
+            if (socket.Connected)
             {
                 Packet packet = new Packet(type, hostName, message);
                 string jsonString = JsonSerializer.Serialize(packet);
@@ -105,7 +111,7 @@ namespace tddd49.Network
 
                 try
                 { 
-                    sendSocket.Send(bytes);
+                    socket.Send(bytes);
                 }
                 catch
                 {
@@ -116,14 +122,14 @@ namespace tddd49.Network
             }
         }
 
-        private void Recieve()
+        private void Receive()
         {
             while (true)
             {
                 byte[] bytes = new byte[1024];
                 try
                 {
-                    sendSocket.Receive(bytes);
+                    socket.Receive(bytes);
                     if (bytes.Count() > 0)
                     {
                         string jsonString = Encoding.UTF8.GetString(bytes).Trim((char) 0x00);
@@ -137,10 +143,14 @@ namespace tddd49.Network
                 }
                 catch (Exception e)
                 {
+                    App.Current.Dispatcher.Invoke(() => disconnected?.Invoke(this, null));
+                    Console.Out.WriteLine(e.Message);
                     Close();
                     return;
                 }
+    
             }
+
 
         }
 
@@ -148,10 +158,11 @@ namespace tddd49.Network
         {
             if (packet.packetType == PacketType.RequestChat)
             {
+                peerName = packet.userName;
                 if (MessageBox.Show($"{packet.userName} Wants to Chat, Accept ?", "Chat Request", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                 {
                     SendPacket(PacketType.AcceptChat);
-     
+                    connectToChat?.Invoke(this, null);
                 }
                 else
                 {
@@ -160,31 +171,24 @@ namespace tddd49.Network
             }
             else if (packet.packetType == PacketType.AcceptChat)
             {
-    
+                MessageBox.Show("Chat request was accepted.");
+                peerName = packet.userName;
+                connectToChat?.Invoke(this, null);
             }
             else if (packet.packetType == PacketType.DeclineChat)
             {
-     
+                MessageBox.Show("Chat request was declined.");
+                peerName = packet.userName;
             }
             else if (packet.packetType == PacketType.ChatMessage)
             {
-
+                App.Current.Dispatcher.Invoke(() => recieveChatMessage?.Invoke(packet, null));
             }
         }
 
         public void Close()
         {
-            Thread thread = new Thread(_close);
-            thread.IsBackground = true;
-            thread.Start();
+            Task.Run(() => socket.Shutdown(SocketShutdown.Both));
         }
-
-        private void _close()
-        {
-            sendSocket.Close();
-            recieveSocket.Close();
-        }
-
-
     }
 }

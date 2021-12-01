@@ -8,22 +8,83 @@ using System.Net.Sockets;
 using tddd49.Command;
 using tddd49.Stores;
 using tddd49.Network;
+using System.Collections.ObjectModel;
+using tddd49.Model;
+using System.Windows.Controls;
+using System.Windows;
 
 namespace tddd49.ViewModel
 {
     class ChatViewModel : ViewModelBase
     {
         private Client client;
+
+        private String message;
+        private ChatConversation conversation;
+        private StackPanel chatPanel;
+        
+        public String Message { get => message; set { message = value; OnPropertyChanged("Message"); } }
+        public ChatConversation Conversation { get => conversation; }
+        public StackPanel ChatPanel { get => chatPanel; set { chatPanel = value; OnPropertyChanged("ChatPanel");}}
+
         public ICommand ExitChatCommand { get; }
+        public ICommand ExitChatButtonCommand { get => new RelayCommand(ExitChatButton); }
+        public ICommand SendChatMessage { get => new RelayCommand(SendMessageButton);
+    }
         public ChatViewModel(NavigationStore navigationStore, Client client)
         {
             ExitChatCommand = new ExitChatCommand(navigationStore);
             this.client = client;
+            client.recieveChatMessage += (packet, _) => { receiveChatMessage((Packet) packet); };
+            client.disconnected += (sender, _) => { ConnectionLost(); };
+
+            conversation = new ChatConversation();
+            ChatMessage userJoinedMessage = new ChatMessage($"User {client.HostName} has joined the chat.", "System");
+            conversation.addMessage(userJoinedMessage);
+            userJoinedMessage = new ChatMessage($"User {client.PeerName} has joined the chat.", "System");
+            conversation.addMessage(userJoinedMessage);
         }
 
-        internal void ExitChatButton()
+
+        internal void AddChatMessage(String message)
         {
-
+            ChatMessage chatMessage = new ChatMessage("user", message);
+            conversation.addMessage(chatMessage);
         }
+
+        internal void SendMessageButton()
+        {
+            // send packet through Client
+            if (message.Length > 0)
+            {
+                client.SendPacket(Packet.PacketType.ChatMessage, message);
+
+                ChatMessage chatMessage = new ChatMessage(message, client.HostName);
+                conversation.addMessage(chatMessage);
+
+                Message = "";
+
+            }
+        }
+
+        private void receiveChatMessage(Packet packet)
+        {
+            ChatMessage chatMessage = new ChatMessage(packet.message, packet.userName);
+            conversation.addMessage(chatMessage);
+ 
+        }
+
+        private void ConnectionLost()
+        {
+            ChatMessage userLeaveMessage = new ChatMessage($"User {client.PeerName} has left the chat.", "System");
+            conversation.addMessage(userLeaveMessage);
+            // save conversation ?
+        }
+        private void ExitChatButton()
+        {
+            client.Close();
+            ExitChatCommand.Execute(null);
+        }
+
     }
 }

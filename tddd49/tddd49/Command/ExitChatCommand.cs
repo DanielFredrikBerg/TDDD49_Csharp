@@ -14,7 +14,7 @@ namespace tddd49.Command
         {
         }
 
-        override public void Execute(object parameter)
+        override public void Execute(object _)
         {
             _navigationStore.CurrentViewModel = new ConnectViewModel(_navigationStore);
         }

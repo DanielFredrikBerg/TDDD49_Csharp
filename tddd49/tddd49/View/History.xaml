@@ -4,9 +4,21 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:tddd49.View"
+             xmlns:vm="clr-namespace:tddd49.ViewModel"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
+             d:DesignHeight="454" d:DesignWidth="630">
+    <Grid Background="#FFE5E5E5" Canvas.Left="-15" Width="639" Height="426">
+        <Label Content="Chat History" HorizontalAlignment="Left" Margin="101,27,0,0" VerticalAlignment="Top"/>
+        <ScrollViewer Margin="50,58,387,54">
+            <StackPanel Background="#FFFFFFFF" HorizontalAlignment="Left" MinHeight="332" VerticalAlignment="Top" Width="202" Height="80"/>
+        </ScrollViewer>
+
+        <Label Content="Chat Conversation" HorizontalAlignment="Left" Margin="415,27,0,0" VerticalAlignment="Top"/>
+        <ScrollViewer Margin="326,53,42,42">
+            <StackPanel Background="#FFFFFFFF" HorizontalAlignment="Left" Height="332" VerticalAlignment="Top" Width="273"/>
+        </ScrollViewer>
+
+
+
     </Grid>
 </UserControl>

@@ -13,7 +13,7 @@
             <ContentControl Content="{Binding CurrentViewModel}">
                 <ContentControl.Resources>
                     <DataTemplate DataType="{x:Type viewmodels:ConnectViewModel}">
-                        <views:JoinHost/>
+                        <views:Connect/>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type viewmodels:ChatViewModel}">
                         <views:Chat/>
@@ -22,13 +22,13 @@
             </ContentControl>
         </TabItem>
         <TabItem Header="History">
-            <Grid Background="#FFE5E5E5" Margin="0,1,-8,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="155*"/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-            </Grid>
+            <ContentControl Content="{Binding CurrentViewModel}">
+                <ContentControl.Resources>
+                    <DataTemplate DataType="{x:Type viewmodels:HistoryViewModel}">
+                        <views:History/>
+                    </DataTemplate>
+                </ContentControl.Resources>
+            </ContentControl>
         </TabItem>
     </TabControl>
-    
 </Window>
