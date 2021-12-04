@@ -6,7 +6,17 @@ using System.Threading.Tasks;
 
 namespace tddd49.ViewModel
 {
-    class HistoryViewModel
+    class HistoryViewModel : ViewModelBase
     {
+
+        private String searchWord;
+
+        public String SearchWord { get => searchWord; set { searchWord = value; OnPropertyChanged("SearchWord"); } }
+
+        public HistoryViewModel()
+        {
+
+        }
+
     }
 }

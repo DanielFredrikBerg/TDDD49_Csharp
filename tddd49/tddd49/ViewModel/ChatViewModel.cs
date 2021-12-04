@@ -35,10 +35,11 @@ namespace tddd49.ViewModel
         {
             ExitChatCommand = new ExitChatCommand(navigationStore);
             this.client = client;
-            client.recieveChatMessage += (packet, _) => { receiveChatMessage((Packet) packet); };
+            client.recieveChatMessage += (packet, _) => { ReceiveChatMessage((Packet) packet); };
             client.disconnected += (sender, _) => { ConnectionLost(); };
 
-            conversation = new ChatConversation();
+            conversation = new ChatConversation(client.HostName, client.PeerName);
+            ChatHistory.AddConversation(conversation);
             ChatMessage userJoinedMessage = new ChatMessage($"User {client.HostName} has joined the chat.", "System");
             conversation.addMessage(userJoinedMessage);
             userJoinedMessage = new ChatMessage($"User {client.PeerName} has joined the chat.", "System");
@@ -67,7 +68,7 @@ namespace tddd49.ViewModel
             }
         }
 
-        private void receiveChatMessage(Packet packet)
+        private void ReceiveChatMessage(Packet packet)
         {
             ChatMessage chatMessage = new ChatMessage(packet.message, packet.userName);
             conversation.addMessage(chatMessage);
@@ -82,8 +83,14 @@ namespace tddd49.ViewModel
         }
         private void ExitChatButton()
         {
+
             client.Close();
             ExitChatCommand.Execute(null);
+        }
+
+        private void SaveConversation()
+        {
+
         }
 
     }

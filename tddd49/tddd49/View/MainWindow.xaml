@@ -22,12 +22,8 @@
             </ContentControl>
         </TabItem>
         <TabItem Header="History">
-            <ContentControl Content="{Binding CurrentViewModel}">
-                <ContentControl.Resources>
-                    <DataTemplate DataType="{x:Type viewmodels:HistoryViewModel}">
-                        <views:History/>
-                    </DataTemplate>
-                </ContentControl.Resources>
+            <ContentControl DataContext="{Binding historyViewModel}">
+                <views:History/>
             </ContentControl>
         </TabItem>
     </TabControl>

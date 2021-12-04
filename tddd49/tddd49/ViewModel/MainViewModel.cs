@@ -13,11 +13,13 @@ namespace tddd49.ViewModel
     {
         private readonly NavigationStore _navigationStore;
         public ViewModelBase CurrentViewModel => _navigationStore.CurrentViewModel;
+        public HistoryViewModel historyViewModel;
 
         public MainViewModel(NavigationStore navigationStore)
         {
             _navigationStore = navigationStore;
             _navigationStore.CurrentViewModelChanged += OnCurrentViewModelChanged;
+            historyViewModel = new HistoryViewModel();
         }
 
         private void OnCurrentViewModelChanged()

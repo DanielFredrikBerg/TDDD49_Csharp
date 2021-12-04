@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using tddd49.Model;
 
 namespace tddd49
 {
@@ -19,7 +20,6 @@ namespace tddd49
 
             var mainWindow = new MainWindow();
             mainWindow.Show();
-
             mainWindow.Closed += Window_Closed;
         }
 
@@ -27,7 +27,11 @@ namespace tddd49
         {
             // Code for after window closes goes here.
             // save data here ?
-            MessageBox.Show("Goodbye World!");
+            if (ChatHistory.IsUpdated)
+            {
+                MessageBox.Show("Saving Chat History TODO");
+            }
+            
         }
     }
 }

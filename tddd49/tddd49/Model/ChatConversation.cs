@@ -10,13 +10,20 @@ namespace tddd49.Model
     class ChatConversation
     {
 
-       private ObservableCollection<ChatMessage> messages;
-       // time var
+        private ObservableCollection<ChatMessage> messages;
+        public String hostName;
+        public String peerName;
+        public DateTime dateTime;
 
-       public ObservableCollection<ChatMessage> Messages { get => messages; }
+        // time var
 
-        public ChatConversation()
+        public ObservableCollection<ChatMessage> Messages { get => messages; }
+
+        public ChatConversation(String hostName, String peerName)
         {
+            this.hostName = hostName;
+            this.peerName = peerName;
+            dateTime = DateTime.Now;
             messages = new ObservableCollection<ChatMessage>();
         }
 
