@@ -15,8 +15,6 @@ namespace tddd49.Model
         public String peerName;
         public DateTime dateTime;
 
-        // time var
-
         public ObservableCollection<ChatMessage> Messages { get => messages; }
 
         public ChatConversation(String hostName, String peerName)
@@ -28,11 +26,15 @@ namespace tddd49.Model
         }
 
         
-        public void addMessage(ChatMessage message)
+        public void AddMessage(ChatMessage message)
         {
             messages.Add(message);
         }
-        
+
+        public override string ToString()
+        {
+            return dateTime + ":\n" + "Username: " + hostName + "\n" + "Peername: " + peerName;
+        }
 
 
     }

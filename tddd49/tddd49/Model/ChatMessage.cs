@@ -9,11 +9,7 @@ namespace tddd49.Model
     class ChatMessage
     {
         public String message;
-        private String sender;
-        // Time sent var
-
-
-        //public String Message {get =>message; set { message = value; OnPropertyChanged("Message"); } }
+        public String sender;
 
         public ChatMessage(String message, String sender)
         {

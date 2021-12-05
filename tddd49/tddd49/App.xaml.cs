@@ -16,11 +16,11 @@ namespace tddd49
     {
         private void App_Startup(object sender, StartupEventArgs e)
         {
-            // Code for before window opens (optional);
-
+            ChatHistory.Load();
             var mainWindow = new MainWindow();
             mainWindow.Show();
             mainWindow.Closed += Window_Closed;
+            
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -29,7 +29,8 @@ namespace tddd49
             // save data here ?
             if (ChatHistory.IsUpdated)
             {
-                MessageBox.Show("Saving Chat History TODO");
+                MessageBox.Show("Saving Chat History");
+                ChatHistory.Save();
             }
             
         }

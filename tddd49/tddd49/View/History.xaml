@@ -5,19 +5,31 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:tddd49.View"
              xmlns:vm="clr-namespace:tddd49.ViewModel"
+             xmlns:m="clr-namespace:tddd49.Model"
              mc:Ignorable="d" 
              d:DesignHeight="454" d:DesignWidth="630">
     <Grid Background="#FFE5E5E5" Canvas.Left="-15" Width="639" Height="426">
         <Label Content="Chat History" HorizontalAlignment="Left" Margin="101,27,0,0" VerticalAlignment="Top"/>
         <ScrollViewer Margin="50,58,387,104">
-            <StackPanel Background="#FFFFFFFF" HorizontalAlignment="Left" MinHeight="262" VerticalAlignment="Top" Width="202" Height="172"/>
+            <ListBox Background="#FFFFFFFF" HorizontalAlignment="Left" MinHeight="262" VerticalAlignment="Top" Width="202" ItemsSource="{Binding ConversationList }" SelectedItem="{Binding SelectedConversation}">
+
+            </ListBox>
         </ScrollViewer>
 
         <Label Content="Chat Conversation" HorizontalAlignment="Left" Margin="415,27,0,0" VerticalAlignment="Top"/>
         <ScrollViewer Margin="326,53,42,48">
-            <StackPanel Background="#FFFFFFFF" HorizontalAlignment="Left" MinHeight="324" VerticalAlignment="Top" Width="273"/>
+            <StackPanel Background="#FFFFFFFF" HorizontalAlignment="Left" MinHeight="324" VerticalAlignment="Top" Width="273">
+                <ItemsControl ItemsSource="{Binding SelectedConversation.Messages}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type m:ChatMessage}">
+                            <Label Content="{Binding }"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
         </ScrollViewer>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="50,355,0,0" TextWrapping="Wrap" Text="{Binding SearchWord}" VerticalAlignment="Top" Width="202"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="50,355,0,0" TextWrapping="Wrap" Text="{Binding SearchWord, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="202">
+        </TextBox>
         <Label Content="Search Chat History" HorizontalAlignment="Left" Margin="101,329,0,0" VerticalAlignment="Top"/>
 
 

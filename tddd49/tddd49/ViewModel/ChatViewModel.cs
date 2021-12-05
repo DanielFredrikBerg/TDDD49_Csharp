@@ -21,11 +21,10 @@ namespace tddd49.ViewModel
 
         private String message;
         private ChatConversation conversation;
-        private StackPanel chatPanel;
         
         public String Message { get => message; set { message = value; OnPropertyChanged("Message"); } }
         public ChatConversation Conversation { get => conversation; }
-        public StackPanel ChatPanel { get => chatPanel; set { chatPanel = value; OnPropertyChanged("ChatPanel");}}
+
 
         public ICommand ExitChatCommand { get; }
         public ICommand ExitChatButtonCommand { get => new RelayCommand(ExitChatButton); }
@@ -41,16 +40,16 @@ namespace tddd49.ViewModel
             conversation = new ChatConversation(client.HostName, client.PeerName);
             ChatHistory.AddConversation(conversation);
             ChatMessage userJoinedMessage = new ChatMessage($"User {client.HostName} has joined the chat.", "System");
-            conversation.addMessage(userJoinedMessage);
+            conversation.AddMessage(userJoinedMessage);
             userJoinedMessage = new ChatMessage($"User {client.PeerName} has joined the chat.", "System");
-            conversation.addMessage(userJoinedMessage);
+            conversation.AddMessage(userJoinedMessage);
         }
 
 
         internal void AddChatMessage(String message)
         {
             ChatMessage chatMessage = new ChatMessage("user", message);
-            conversation.addMessage(chatMessage);
+            conversation.AddMessage(chatMessage);
         }
 
         internal void SendMessageButton()
@@ -61,7 +60,7 @@ namespace tddd49.ViewModel
                 client.SendPacket(Packet.PacketType.ChatMessage, message);
 
                 ChatMessage chatMessage = new ChatMessage(message, client.HostName);
-                conversation.addMessage(chatMessage);
+                conversation.AddMessage(chatMessage);
 
                 Message = "";
 
@@ -71,26 +70,24 @@ namespace tddd49.ViewModel
         private void ReceiveChatMessage(Packet packet)
         {
             ChatMessage chatMessage = new ChatMessage(packet.message, packet.userName);
-            conversation.addMessage(chatMessage);
+            conversation.AddMessage(chatMessage);
  
         }
 
         private void ConnectionLost()
         {
             ChatMessage userLeaveMessage = new ChatMessage($"User {client.PeerName} has left the chat.", "System");
-            conversation.addMessage(userLeaveMessage);
-            // save conversation ?
+            conversation.AddMessage(userLeaveMessage);
+            //ChatHistory.Save();
         }
         private void ExitChatButton()
         {
+            ChatMessage userLeaveMessage = new ChatMessage($"User {client.HostName} has left the chat.", "System");
+            conversation.AddMessage(userLeaveMessage);
+            //ChatHistory.Save();
 
             client.Close();
             ExitChatCommand.Execute(null);
-        }
-
-        private void SaveConversation()
-        {
-
         }
 
     }

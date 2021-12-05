@@ -5,20 +5,33 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using tddd49.Command;
+using tddd49.Model;
 using tddd49.Stores;
 
 namespace tddd49.ViewModel
 {
     sealed class MainViewModel : ViewModelBase
     {
-        private readonly NavigationStore _navigationStore;
-        public ViewModelBase CurrentViewModel => _navigationStore.CurrentViewModel;
-        public HistoryViewModel historyViewModel;
+        private readonly NavigationStore navigationStore;
+
+        private HistoryViewModel historyViewModel;
+        public HistoryViewModel HistoryViewModel { get => historyViewModel; private set { historyViewModel = value; } }
+  
+        public ViewModelBase CurrentViewModel => navigationStore.CurrentViewModel;
 
         public MainViewModel(NavigationStore navigationStore)
         {
-            _navigationStore = navigationStore;
-            _navigationStore.CurrentViewModelChanged += OnCurrentViewModelChanged;
+            this.navigationStore = navigationStore;
+            this.navigationStore.CurrentViewModelChanged += OnCurrentViewModelChanged;
             historyViewModel = new HistoryViewModel();
         }
 

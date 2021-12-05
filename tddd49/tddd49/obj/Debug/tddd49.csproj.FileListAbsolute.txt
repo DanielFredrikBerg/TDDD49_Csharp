@@ -54,3 +54,5 @@ D:\tddd49\tddd49_danhu849_vikro653\tddd49\tddd49\bin\Debug\System.Text.Json.xml
 D:\tddd49\tddd49_danhu849_vikro653\tddd49\tddd49\bin\Debug\System.Threading.Tasks.Extensions.xml
 D:\tddd49\tddd49_danhu849_vikro653\tddd49\tddd49\bin\Debug\System.ValueTuple.xml
 D:\tddd49\tddd49_danhu849_vikro653\tddd49\tddd49\obj\Debug\tddd49.csproj.CopyComplete
+D:\tddd49\tddd49_danhu849_vikro653\tddd49\tddd49\bin\Debug\Newtonsoft.Json.dll
+D:\tddd49\tddd49_danhu849_vikro653\tddd49\tddd49\bin\Debug\Newtonsoft.Json.xml

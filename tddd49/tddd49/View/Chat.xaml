@@ -17,7 +17,7 @@
         <Button Content="Send" HorizontalAlignment="Left" Margin="301,393,0,0" VerticalAlignment="Top" Width="49" RenderTransformOrigin="0.35,1.114" Command="{Binding SendChatMessage}" />
         <TextBox HorizontalAlignment="Left" Height="23" Margin="4,390,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="292" Text="{Binding Message, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         <ScrollViewer Margin="0,0,10,41" Grid.ColumnSpan="2" local:AutoScrollBehavior.AutoScroll="True">
-            <StackPanel x:Name="chatPanelName" VerticalAlignment="Top" Background="White" MinHeight="385">
+            <StackPanel VerticalAlignment="Top" Background="White" MinHeight="385">
                 <ItemsControl ItemsSource="{Binding Conversation.Messages}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="{x:Type m:ChatMessage}">

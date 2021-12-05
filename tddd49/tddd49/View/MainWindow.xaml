@@ -22,7 +22,7 @@
             </ContentControl>
         </TabItem>
         <TabItem Header="History">
-            <ContentControl DataContext="{Binding historyViewModel}">
+            <ContentControl DataContext="{Binding HistoryViewModel}">
                 <views:History/>
             </ContentControl>
         </TabItem>
