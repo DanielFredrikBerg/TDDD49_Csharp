@@ -10,7 +10,7 @@ using System.Windows;
 using System.Threading;
 using System.ComponentModel;
 using static tddd49.Network.Packet;
-
+using System.Media;
 
 namespace tddd49.Network
 {
@@ -183,6 +183,11 @@ namespace tddd49.Network
             else if (packet.packetType == PacketType.ChatMessage)
             {
                 App.Current.Dispatcher.Invoke(() => recieveChatMessage?.Invoke(packet, null));
+            }
+            else if (packet.packetType == PacketType.Buzz)
+            {
+                SoundPlayer player = new SoundPlayer(@"wario_sound.wav");
+                player.Play();
             }
         }
 

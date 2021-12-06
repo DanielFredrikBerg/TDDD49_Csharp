@@ -23,7 +23,8 @@ namespace tddd49.Network
             RequestChat = 0,
             AcceptChat = 1,
             DeclineChat = 2,
-            ChatMessage = 3
+            ChatMessage = 3,
+            Buzz = 4
         }
     }
 }

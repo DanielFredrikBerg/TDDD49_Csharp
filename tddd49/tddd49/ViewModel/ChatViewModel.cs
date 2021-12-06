@@ -28,8 +28,8 @@ namespace tddd49.ViewModel
 
         public ICommand ExitChatCommand { get; }
         public ICommand ExitChatButtonCommand { get => new RelayCommand(ExitChatButton); }
-        public ICommand SendChatMessage { get => new RelayCommand(SendMessageButton);
-    }
+        public ICommand SendChatMessage { get => new RelayCommand(SendMessageButton);}
+        public ICommand SendBuzz { get => new RelayCommand(SendBuzzButton); }
         public ChatViewModel(NavigationStore navigationStore, Client client)
         {
             ExitChatCommand = new ExitChatCommand(navigationStore);
@@ -46,16 +46,16 @@ namespace tddd49.ViewModel
         }
 
 
-        internal void AddChatMessage(String message)
+        private void AddChatMessage(String message)
         {
             ChatMessage chatMessage = new ChatMessage("user", message);
             conversation.AddMessage(chatMessage);
         }
 
-        internal void SendMessageButton()
+        private void SendMessageButton()
         {
             // send packet through Client
-            if (message.Length > 0)
+            if (message != null && message.Length > 0)
             {
                 client.SendPacket(Packet.PacketType.ChatMessage, message);
 
@@ -65,6 +65,11 @@ namespace tddd49.ViewModel
                 Message = "";
 
             }
+        }
+
+        private void SendBuzzButton()
+        {
+            client.SendPacket(Packet.PacketType.Buzz);
         }
 
         private void ReceiveChatMessage(Packet packet)
