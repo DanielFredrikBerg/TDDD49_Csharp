@@ -26,10 +26,8 @@ namespace tddd49
         private void Window_Closed(object sender, EventArgs e)
         {
             // Code for after window closes goes here.
-            // save data here ?
             if (ChatHistory.IsUpdated)
             {
-                MessageBox.Show("Saving Chat History");
                 ChatHistory.Save();
             }
             

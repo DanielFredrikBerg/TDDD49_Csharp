@@ -148,10 +148,7 @@ namespace tddd49.Network
                     Close();
                     return;
                 }
-    
             }
-
-
         }
 
         private void OnPacketRecieved(Packet packet)
