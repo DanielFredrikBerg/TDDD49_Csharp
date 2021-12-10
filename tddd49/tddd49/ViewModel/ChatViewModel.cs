@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
-using System.Net.Sockets;
 using tddd49.Command;
 using tddd49.Stores;
 using tddd49.Network;
-using System.Collections.ObjectModel;
 using tddd49.Model;
-using System.Windows.Controls;
-using System.Windows;
+
 
 namespace tddd49.ViewModel
 {
@@ -25,7 +18,6 @@ namespace tddd49.ViewModel
         public String Message { get => message; set { message = value; OnPropertyChanged("Message"); } }
         public ChatConversation Conversation { get => conversation; }
 
-
         public ICommand ExitChatCommand { get; }
         public ICommand ExitChatButtonCommand { get => new RelayCommand(ExitChatButton); }
         public ICommand SendChatMessage { get => new RelayCommand(SendMessageButton);}
@@ -38,7 +30,7 @@ namespace tddd49.ViewModel
             client.disconnected += (sender, _) => { ConnectionLost(); };
 
             conversation = new ChatConversation(client.HostName, client.PeerName);
-            ChatHistory.AddConversation(conversation);
+            App.Current.Dispatcher.Invoke(() => ChatHistory.AddConversation(Conversation));
             ChatMessage userJoinedMessage = new ChatMessage($"User {client.HostName} has joined the chat.", "System");
             conversation.AddMessage(userJoinedMessage);
             userJoinedMessage = new ChatMessage($"User {client.PeerName} has joined the chat.", "System");
@@ -63,7 +55,6 @@ namespace tddd49.ViewModel
                 conversation.AddMessage(chatMessage);
 
                 Message = "";
-
             }
         }
 
@@ -83,13 +74,13 @@ namespace tddd49.ViewModel
         {
             ChatMessage userLeaveMessage = new ChatMessage($"User {client.PeerName} has left the chat.", "System");
             conversation.AddMessage(userLeaveMessage);
-            //ChatHistory.Save();
+            ChatHistory.Save();
         }
         private void ExitChatButton()
         {
             ChatMessage userLeaveMessage = new ChatMessage($"User {client.HostName} has left the chat.", "System");
             conversation.AddMessage(userLeaveMessage);
-            //ChatHistory.Save();
+            ChatHistory.Save();
 
             client.Close();
             ExitChatCommand.Execute(null);

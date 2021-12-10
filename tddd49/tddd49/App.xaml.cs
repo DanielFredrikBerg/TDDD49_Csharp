@@ -30,7 +30,6 @@ namespace tddd49
             {
                 ChatHistory.Save();
             }
-            
         }
     }
 }

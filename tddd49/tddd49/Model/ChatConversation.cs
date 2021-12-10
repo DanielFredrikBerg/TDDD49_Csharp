@@ -25,7 +25,7 @@ namespace tddd49.Model
             messages = new ObservableCollection<ChatMessage>();
         }
 
-        
+       
         public void AddMessage(ChatMessage message)
         {
             messages.Add(message);

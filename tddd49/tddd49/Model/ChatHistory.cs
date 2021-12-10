@@ -11,6 +11,7 @@ namespace tddd49.Model
 {
     class ChatHistory
     {
+
         private static readonly String filePath = "chat_history.json";
 
         private static ObservableCollection<ChatConversation> conversations;
@@ -28,8 +29,8 @@ namespace tddd49.Model
         public static void AddConversation(ChatConversation conversation)
         {
             isUpdated = true;
-            App.Current.Dispatcher.Invoke(() => conversations.Add(conversation));
-        }
+            conversations.Add(conversation);
+        } 
 
         public static void Save()
         {
