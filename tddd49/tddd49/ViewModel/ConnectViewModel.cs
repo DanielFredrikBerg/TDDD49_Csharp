@@ -4,6 +4,7 @@ using System.Windows.Input;
 using tddd49.Command;
 using tddd49.Network;
 using tddd49.Stores;
+using static tddd49.Network.Packet;
 
 namespace tddd49.ViewModel
 {
@@ -14,11 +15,11 @@ namespace tddd49.ViewModel
 
         // store TextField input
         private string userName;
-        private string iPAddress;
+        private string ipAddress;
         private string port;
 
         public string UserName { get => userName; set { userName = value; OnPropertyChanged("UserName"); } }
-        public string IPAddress { get => iPAddress; set { iPAddress = value; OnPropertyChanged("IPAddress"); } }
+        public string IPAddress { get => ipAddress; set { ipAddress = value; OnPropertyChanged("IPAddress"); } }
         public string Port { get => port; set { port = value; OnPropertyChanged("Port"); } }
 
 
@@ -95,7 +96,7 @@ namespace tddd49.ViewModel
         {
             if (ValidatePort() && ValidateUserName())
             {
-                iPAddress = "127.0.0.1";
+                ipAddress = "127.0.0.1";
                 ResetClient();
                 client.InitListening();
             }
@@ -108,8 +109,26 @@ namespace tddd49.ViewModel
                 client.Close();
             }
 
-            client = new Client(port, iPAddress, userName);
+            client = new Client(port, ipAddress, userName);
             client.connectToChat += (source, _) => { JoinChatCommand.Execute(client); };
+            client.unableToConnect += (source, _) => { MessageBox.Show($"Unable to connect to {ipAddress}:{port}", "Error"); };
+            client.portAlreadyInUse += (source, _) => { MessageBox.Show($"Port {port} is already in use.", "Error"); };
+            client.listeningForConnection += (source, _) => { MessageBox.Show($"Listening for connections on {ipAddress}:{port}"); };
+            client.connectionLost += (source, _) => { MessageBox.Show("Connection Lost"); };
+            client.chatAccepted += (source, _) => { MessageBox.Show("Chat request was accepted."); };
+            client.chatDeclined += (source, _) => { MessageBox.Show("Chat request was declined."); };
+            client.chatRequest += (peerName, _) =>
+            {
+                if (MessageBox.Show($"{peerName} Wants to Chat, Accept ?", "Chat Request", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    client.SendPacket(PacketType.AcceptChat);
+                    JoinChatCommand.Execute(client);
+                }
+                else
+                {
+                    client.SendPacket(PacketType.DeclineChat);
+                }
+            };
         }
 
 
@@ -132,12 +151,12 @@ namespace tddd49.ViewModel
 
         private bool ValidateIP()
         {
-            if (string.IsNullOrEmpty(iPAddress))
+            if (string.IsNullOrEmpty(ipAddress))
             {
                 MessageBox.Show("IP-address is required.");
                 return false;
             }
-            else if (!Regex.IsMatch(iPAddress, @"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"))
+            else if (!Regex.IsMatch(ipAddress, @"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"))
             {
                 MessageBox.Show("Invalid IP-address.");
                 return false;

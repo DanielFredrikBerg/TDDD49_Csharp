@@ -25,6 +25,15 @@ namespace tddd49.Network
         public EventHandler connectToChat;
         public EventHandler recieveChatMessage;
         public EventHandler disconnected;
+
+        public EventHandler unableToConnect;
+        public EventHandler portAlreadyInUse;
+        public EventHandler listeningForConnection;
+        public EventHandler connectionLost;
+        public EventHandler chatRequest;
+        public EventHandler chatAccepted;
+        public EventHandler chatDeclined;
+
         public String HostName { get => hostName; }
         public String PeerName { get => peerName; }
 
@@ -52,17 +61,14 @@ namespace tddd49.Network
             try
             {
                 socket.Connect(ipEndPoint);
-                //MessageBox.Show("Init connection post connect");
             }
             catch
             {
-                MessageBox.Show($"Unable to connect to {ipAddress}:{port}", "Error");
+                unableToConnect?.Invoke(this, null);
                 return;
             }
 
             SendPacket(PacketType.RequestChat);
-
-            //Task listenTask = Task.Run(() => Listen());
             Task.Run(Receive);
         }
 
@@ -77,7 +83,7 @@ namespace tddd49.Network
                 }
                 catch
                 {
-                    MessageBox.Show($"Port {port} is already in use.", "Error");
+                    portAlreadyInUse?.Invoke(this, null);
                     return;
                 }
             }
@@ -89,7 +95,8 @@ namespace tddd49.Network
         {
             // start listening
             socket.Listen(1024);
-            MessageBox.Show($"Listening for connections on {ipAddress}:{port}");
+
+            listeningForConnection?.Invoke(this, null);
 
             // wait for connection
             socket = socket.Accept();
@@ -112,7 +119,7 @@ namespace tddd49.Network
                 }
                 catch
                 {
-                    MessageBox.Show("Connection Lost");
+                    connectionLost?.Invoke(this, null);
                     // throw exception ?
                 }
 
@@ -141,7 +148,6 @@ namespace tddd49.Network
                 catch (Exception e)
                 {
                     App.Current.Dispatcher.Invoke(() => disconnected?.Invoke(this, null));
-                    Console.Out.WriteLine(e.Message);
                     Close();
                     return;
                 }
@@ -153,26 +159,18 @@ namespace tddd49.Network
             if (packet.packetType == PacketType.RequestChat)
             {
                 peerName = packet.userName;
-                if (MessageBox.Show($"{packet.userName} Wants to Chat, Accept ?", "Chat Request", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                {
-                    SendPacket(PacketType.AcceptChat);
-                    connectToChat?.Invoke(this, null);
-                }
-                else
-                {
-                    SendPacket(PacketType.DeclineChat);
-                }
+                chatRequest?.Invoke(peerName, null);
             }
             else if (packet.packetType == PacketType.AcceptChat)
             {
-                MessageBox.Show("Chat request was accepted.");
                 peerName = packet.userName;
+                chatAccepted?.Invoke(this, null);
                 connectToChat?.Invoke(this, null);
             }
             else if (packet.packetType == PacketType.DeclineChat)
             {
-                MessageBox.Show("Chat request was declined.");
                 peerName = packet.userName;
+                chatDeclined?.Invoke(this, null);
             }
             else if (packet.packetType == PacketType.ChatMessage)
             {
